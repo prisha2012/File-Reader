@@ -1,7 +1,7 @@
-import { DocumentProcessor } from '@/components/DocumentProcessor';
+import { EnhancedDocumentProcessor } from '@/components/EnhancedDocumentProcessor';
 
 const Index = () => {
-  return <DocumentProcessor />;
+  return <EnhancedDocumentProcessor />;
 };
 
 export default Index;
