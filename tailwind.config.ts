@@ -52,6 +52,17 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// Document-specific colors
+				document: {
+					DEFAULT: 'hsl(var(--document-bg))',
+					border: 'hsl(var(--document-border))',
+				},
+				editor: {
+					DEFAULT: 'hsl(var(--editor-bg))',
+				},
+				toolbar: {
+					DEFAULT: 'hsl(var(--toolbar-bg))',
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
