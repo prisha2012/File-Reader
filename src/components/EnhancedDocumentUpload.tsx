@@ -63,11 +63,33 @@ export const EnhancedDocumentUpload = ({ onFileUpload, isProcessing }: EnhancedD
           variant: "default",
         });
         return;
-      } else if (fileType.includes('word') || fileType.includes('document')) {
-        content = 'Word document processing coming soon...';
+      } else if (fileType.includes('word') || fileType.includes('document') || 
+                 fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+                 fileType === 'application/msword') {
+        try {
+          const mammoth = await import('mammoth');
+          const arrayBuffer = await file.arrayBuffer();
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          content = result.value;
+          
+          if (result.messages.length > 0) {
+            console.warn('Word document processing warnings:', result.messages);
+          }
+        } catch (error) {
+          toast({
+            title: "Word Document Error",
+            description: "Failed to process Word document. Please try converting to TXT format.",
+            variant: "destructive",
+          });
+          return;
+        }
+      } else if (fileType.includes('presentation') || 
+                 fileType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+                 fileType === 'application/vnd.ms-powerpoint') {
+        content = 'PowerPoint processing coming soon...';
         toast({
-          title: "Word Document Support", 
-          description: "Word document processing will be implemented in the next update.",
+          title: "PowerPoint Support",
+          description: "PowerPoint text extraction will be implemented in the next update.",
           variant: "default",
         });
         return;
@@ -150,6 +172,7 @@ export const EnhancedDocumentUpload = ({ onFileUpload, isProcessing }: EnhancedD
   const getFileIcon = (fileType: string) => {
     if (fileType.includes('pdf')) return <File className="h-8 w-8 text-red-500" />;
     if (fileType.includes('word') || fileType.includes('document')) return <FileText className="h-8 w-8 text-blue-500" />;
+    if (fileType.includes('presentation') || fileType.includes('powerpoint')) return <FileText className="h-8 w-8 text-orange-500" />;
     if (fileType.includes('image')) return <Image className="h-8 w-8 text-green-500" />;
     return <FileText className="h-8 w-8 text-muted-foreground" />;
   };
@@ -205,6 +228,7 @@ export const EnhancedDocumentUpload = ({ onFileUpload, isProcessing }: EnhancedD
               { type: 'text/plain', label: 'TXT', color: 'text-blue-500' },
               { type: 'application/pdf', label: 'PDF', color: 'text-red-500' },
               { type: 'application/msword', label: 'DOC', color: 'text-green-500' },
+              { type: 'application/vnd.ms-powerpoint', label: 'PPT', color: 'text-orange-500' },
             ].map((format, index) => (
               <motion.div 
                 key={format.type} 
@@ -227,7 +251,7 @@ export const EnhancedDocumentUpload = ({ onFileUpload, isProcessing }: EnhancedD
             onChange={handleFileSelect}
             className="hidden"
             id="file-upload"
-            accept=".txt,.pdf,.doc,.docx"
+            accept=".txt,.pdf,.doc,.docx,.ppt,.pptx"
             disabled={isProcessing}
             multiple
           />

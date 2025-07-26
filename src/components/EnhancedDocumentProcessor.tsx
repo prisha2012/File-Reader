@@ -54,7 +54,7 @@ export const EnhancedDocumentProcessor = () => {
         showTemplates={showTemplates}
       />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="w-full px-4 py-8">
         <AnimatePresence mode="wait">
           {!currentDocument ? (
             <motion.div
@@ -63,7 +63,7 @@ export const EnhancedDocumentProcessor = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.4 }}
-              className="space-y-8"
+              className="space-y-8 max-w-4xl mx-auto"
             >
               <div className="text-center mb-12">
                 <motion.h2 
@@ -80,7 +80,7 @@ export const EnhancedDocumentProcessor = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
                 >
-                  Upload, format, summarize, and export with intelligent processing
+                  Upload Word, PowerPoint, PDF, and text files for intelligent processing
                 </motion.p>
               </div>
 
@@ -105,9 +105,9 @@ export const EnhancedDocumentProcessor = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="grid grid-cols-1 lg:grid-cols-4 gap-6"
+              className="w-full max-w-none grid grid-cols-1 xl:grid-cols-4 lg:grid-cols-3 gap-6"
             >
-              <div className="lg:col-span-1 space-y-6">
+              <div className="xl:col-span-1 lg:col-span-1 space-y-6">
                 <DocumentStats 
                   content={currentDocument.content}
                   filename={currentDocument.filename}
@@ -119,7 +119,7 @@ export const EnhancedDocumentProcessor = () => {
                 />
               </div>
 
-              <div className="lg:col-span-3">
+              <div className="xl:col-span-3 lg:col-span-2">
                 <DocumentEditor
                   content={currentDocument.content}
                   filename={currentDocument.filename}
