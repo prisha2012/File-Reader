@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppHeader } from './AppHeader';
 import { EnhancedDocumentUpload } from './EnhancedDocumentUpload';
@@ -6,32 +6,72 @@ import { DocumentEditor } from './DocumentEditor';
 import { DocumentStats } from './DocumentStats';
 import { ToneSelector, ToneType } from './ToneSelector';
 import { DocumentTemplates } from './DocumentTemplates';
+import { useDocuments } from '@/hooks/useDocuments';
+import { toast } from '@/hooks/use-toast';
 
 interface ProcessedDocument {
   content: string;
   filename: string;
   type: string;
   processedAt: Date;
+  id?: string;
 }
 
-export const EnhancedDocumentProcessor = () => {
+interface EnhancedDocumentProcessorProps {
+  onBack?: () => void;
+  documentId?: string | null;
+}
+
+export const EnhancedDocumentProcessor: React.FC<EnhancedDocumentProcessorProps> = ({ 
+  onBack, 
+  documentId 
+}) => {
   const [currentDocument, setCurrentDocument] = useState<ProcessedDocument | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedTone, setSelectedTone] = useState<ToneType>('formal');
   const [showTemplates, setShowTemplates] = useState(false);
+  const { documents, saveDocument, updateDocument } = useDocuments();
+
+  // Load document if documentId is provided
+  useEffect(() => {
+    if (documentId && documents.length > 0) {
+      const doc = documents.find(d => d.id === documentId);
+      if (doc) {
+        setCurrentDocument({
+          content: doc.processed_content || doc.original_content,
+          filename: doc.title,
+          type: doc.file_type || 'text/plain',
+          processedAt: new Date(doc.updated_at),
+          id: doc.id
+        });
+        setSelectedTone((doc.tone as ToneType) || 'formal');
+      }
+    }
+  }, [documentId, documents]);
 
   const handleFileUpload = async (content: string, filename: string, type: string) => {
     setIsProcessing(true);
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    const newDocument: ProcessedDocument = {
-      content,
-      filename,
-      type,
-      processedAt: new Date()
-    };
+    // Save to database
+    const savedDoc = await saveDocument(filename, content, undefined, selectedTone, type);
     
-    setCurrentDocument(newDocument);
+    if (savedDoc) {
+      const newDocument: ProcessedDocument = {
+        content,
+        filename,
+        type,
+        processedAt: new Date(),
+        id: savedDoc.id
+      };
+      
+      setCurrentDocument(newDocument);
+      toast({
+        title: "Document saved",
+        description: "Your document has been saved to your account"
+      });
+    }
+    
     setIsProcessing(false);
   };
 
@@ -45,6 +85,30 @@ export const EnhancedDocumentProcessor = () => {
     setShowTemplates(false);
   };
 
+  const handleContentChange = async (content: string) => {
+    if (currentDocument) {
+      const updatedDoc = { ...currentDocument, content };
+      setCurrentDocument(updatedDoc);
+      
+      // Auto-save changes if document exists in database
+      if (updatedDoc.id) {
+        await updateDocument(updatedDoc.id, { 
+          processed_content: content,
+          tone: selectedTone 
+        });
+      }
+    }
+  };
+
+  const handleToneChange = async (tone: ToneType) => {
+    setSelectedTone(tone);
+    
+    // Update database if document exists
+    if (currentDocument?.id) {
+      await updateDocument(currentDocument.id, { tone });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       <AppHeader 
@@ -52,6 +116,7 @@ export const EnhancedDocumentProcessor = () => {
         onNewDocument={handleNewDocument}
         onTemplatesToggle={() => setShowTemplates(!showTemplates)}
         showTemplates={showTemplates}
+        onBack={onBack}
       />
 
       <div className="w-full px-4 py-8">
@@ -94,7 +159,7 @@ export const EnhancedDocumentProcessor = () => {
                   />
                   <ToneSelector 
                     selectedTone={selectedTone}
-                    onToneChange={setSelectedTone}
+                    onToneChange={handleToneChange}
                   />
                 </>
               )}
@@ -114,7 +179,7 @@ export const EnhancedDocumentProcessor = () => {
                 />
                 <ToneSelector 
                   selectedTone={selectedTone}
-                  onToneChange={setSelectedTone}
+                  onToneChange={handleToneChange}
                   isProcessing={isProcessing}
                 />
               </div>
@@ -123,9 +188,7 @@ export const EnhancedDocumentProcessor = () => {
                 <DocumentEditor
                   content={currentDocument.content}
                   filename={currentDocument.filename}
-                  onContentChange={(content) => 
-                    setCurrentDocument(prev => prev ? {...prev, content} : null)
-                  }
+                  onContentChange={handleContentChange}
                 />
               </div>
             </motion.div>

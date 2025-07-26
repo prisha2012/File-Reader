@@ -6,7 +6,8 @@ import {
   Settings, 
   FileText, 
   Sparkles,
-  MoreVertical
+  MoreVertical,
+  ArrowLeft
 } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { motion } from 'framer-motion';
@@ -23,13 +24,15 @@ interface AppHeaderProps {
   onNewDocument: () => void;
   onTemplatesToggle: () => void;
   showTemplates: boolean;
+  onBack?: () => void;
 }
 
 export const AppHeader = ({ 
   hasDocument, 
   onNewDocument, 
   onTemplatesToggle,
-  showTemplates 
+  showTemplates,
+  onBack
 }: AppHeaderProps) => {
   const { theme, setTheme } = useTheme();
 
@@ -47,11 +50,23 @@ export const AppHeader = ({
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo and Title */}
-          <motion.div 
-            className="flex items-center gap-3"
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
+          <div className="flex items-center gap-3">
+            {onBack && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onBack}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </Button>
+            )}
+            <motion.div 
+              className="flex items-center gap-3"
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
             <div className="relative">
               <div className="p-2 bg-gradient-to-br from-primary to-primary/80 rounded-xl shadow-lg">
                 <FileText className="h-6 w-6 text-primary-foreground" />
@@ -67,6 +82,7 @@ export const AppHeader = ({
               <p className="text-xs text-muted-foreground">AI-Powered Document Processing</p>
             </div>
           </motion.div>
+          </div>
 
           {/* Status and Actions */}
           <div className="flex items-center gap-4">
