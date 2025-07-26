@@ -91,7 +91,7 @@ export const ToneSelector = ({ selectedTone, onToneChange, isProcessing }: ToneS
         </Badge>
       </div>
       
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-2">
         {tones.map((tone, index) => (
           <motion.div
             key={tone.type}
@@ -101,23 +101,25 @@ export const ToneSelector = ({ selectedTone, onToneChange, isProcessing }: ToneS
           >
             <Button
               variant={selectedTone === tone.type ? "default" : "outline"}
-              className={`w-full h-auto p-4 flex flex-col items-start gap-2 transition-all duration-200 ${
+              className={`w-full h-auto p-3 flex items-center justify-start gap-3 transition-all duration-200 text-left ${
                 selectedTone === tone.type 
-                  ? 'ring-2 ring-primary/20 shadow-lg scale-[1.02]' 
-                  : 'hover:shadow-md hover:scale-[1.01]'
+                  ? 'ring-2 ring-primary/20 shadow-lg' 
+                  : 'hover:shadow-md'
               }`}
               onClick={() => onToneChange(tone.type)}
               disabled={isProcessing}
             >
-              <div className="flex items-center gap-2 w-full">
-                <tone.icon className={`h-5 w-5 ${tone.color}`} />
-                <span className="font-medium">{tone.label}</span>
+              <div className={`p-2 rounded-md bg-muted/50 ${tone.color} flex-shrink-0`}>
+                <tone.icon className="h-4 w-4" />
               </div>
-              <p className="text-xs text-left text-muted-foreground">
-                {tone.description}
-              </p>
-              <div className="text-xs text-left opacity-70">
-                {tone.example}
+              <div className="flex-1 min-w-0">
+                <div className="font-medium">{tone.label}</div>
+                <div className="text-xs text-muted-foreground">
+                  {tone.description}
+                </div>
+                <div className="text-xs opacity-70 mt-1">
+                  {tone.example}
+                </div>
               </div>
             </Button>
           </motion.div>

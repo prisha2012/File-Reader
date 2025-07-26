@@ -86,7 +86,7 @@ export const DocumentStats = ({ content, filename, processingTime = 0 }: Documen
         </Badge>
       </div>
       
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="space-y-3">
         {stats.map((stat, index) => (
           <motion.div
             key={stat.label}
@@ -96,14 +96,14 @@ export const DocumentStats = ({ content, filename, processingTime = 0 }: Documen
             className="group"
           >
             <div className="flex items-center gap-3 p-3 rounded-lg border border-border/50 hover:border-primary/30 transition-all duration-200 hover:shadow-sm bg-background/50">
-              <div className={`p-2 rounded-md bg-muted/50 ${stat.color}`}>
+              <div className={`p-2 rounded-md bg-muted/50 ${stat.color} flex-shrink-0`}>
                 <stat.icon className="h-4 w-4" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-xl font-bold">{stat.value}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-bold">{stat.value}</span>
+                  <span className="text-sm font-medium text-muted-foreground">{stat.label}</span>
                 </div>
-                <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
                 <p className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                   {stat.description}
                 </p>
